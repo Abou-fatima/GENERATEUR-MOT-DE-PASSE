@@ -13,18 +13,16 @@
         <h1>🔐 Générateur de Mot de Passe</h1>
         
         <div class="password-display">
-            <input type="text" id="passwordOutput" placeholder="Votre mot de passe apparaîtra ici..." readonly>
+            <input type="text" id="passwordOutput" placeholder="Votre mot de passe apparaît ici" readonly>
             <button class="copy-btn" id="copyBtn">Copier</button>
         </div>
         <div id="copyMessage" class="copy-message"></div>
 
         <div class="options">
             <div class="option-group">
-                <label for="lengthSlider">Longueur du mot de passe:</label>
-                <div class="slider-container">
-                    <input type="range" id="lengthSlider" class="slider" min="4" max="50" value="12">
-                </div>
-                <div class="length-display" id="lengthDisplay">12</div>
+                    <label for="lengthSelect">Longueur du mot de passe:</label>
+                    <select id="lengthSelect" class="length-select" style="width: 100px; height: 30px; border-radius: 5px;"></select>
+                    <div class="length-display" id="lengthDisplay"></div>
             </div>
 
             <div class="checkboxes">

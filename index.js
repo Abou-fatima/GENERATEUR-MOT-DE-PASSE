@@ -8,7 +8,7 @@ const characters = {
 
 // Éléments du DOM
 const copyMessage = document.getElementById("copyMessage");
-const lengthSlider = document.getElementById("lengthSlider");
+const lengthSelect = document.getElementById("lengthSelect");
 const lengthDisplay = document.getElementById("lengthDisplay");
 const uppercaseCheck = document.getElementById("uppercase");
 const lowercaseCheck = document.getElementById("lowercase");
@@ -20,14 +20,69 @@ const copyBtn = document.getElementById("copyBtn");
 const strengthFill = document.getElementById("strengthFill");
 const strengthLabel = document.getElementById("strengthLabel");
 
-// Mise à jour de l'affichage de la longueur
-lengthSlider.addEventListener("input", function () {
-  lengthDisplay.textContent = this.value;
+// Remplacement du slider par un select pour la longueur
+for (let i = 4; i <= 8; i++) {
+  const option = document.createElement("option");
+  option.value = i;
+  option.textContent = i;
+  lengthSelect.appendChild(option);
+}
+// Ajout de l'option personnalisée
+const customOption = document.createElement("option");
+customOption.value = "custom";
+customOption.textContent = "Personnalisée...";
+lengthSelect.appendChild(customOption);
+
+// Création de l'input personnalisé (caché par défaut)
+const customLengthInput = document.createElement("input");
+customLengthInput.type = "number";
+customLengthInput.id = "customLengthInput";
+customLengthInput.className = "length-custom-input";
+customLengthInput.min = 4;
+customLengthInput.max = 1000;
+customLengthInput.placeholder = "Longueur (max 1000)";
+customLengthInput.style.display = "none";
+customLengthInput.style.width = "150px";
+customLengthInput.style.height = "30px";
+customLengthInput.style.borderRadius = "5px";
+
+lengthSelect.parentNode.insertBefore(customLengthInput, lengthDisplay);
+
+lengthSelect.value = "";
+lengthDisplay.textContent = "";
+
+lengthSelect.addEventListener("change", function () {
+  if (this.value === "custom") {
+    customLengthInput.style.display = "inline-block";
+    lengthDisplay.textContent = customLengthInput.value || '';
+  } else {
+    customLengthInput.style.display = "none";
+    lengthDisplay.textContent = this.value;
+  }
+});
+
+customLengthInput.addEventListener("input", function () {
+  let val = parseInt(this.value);
+  if (isNaN(val) || val < 4) val = 4;
+  if (val > 1000) val = 1000;
+  this.value = val;
+  lengthDisplay.textContent = val;
 });
 
 // Fonction pour générer un mot de passe
 function generatePassword() {
-  const length = parseInt(lengthSlider.value);
+  let length;
+    // Vérification si aucune longueur n'est sélectionnée
+    if ((lengthSelect.value === "") || (lengthSelect.value === "custom" && customLengthInput.value === "")) {
+        copyMessage.textContent = "Veuillez sélectionner ou saisir une longueur de mot de passe !";
+        copyMessage.style.color = "#d60d0d";
+        setTimeout(() => {
+        copyMessage.textContent = "";
+        }, 3000);
+        return;
+  } else {
+    length = parseInt(lengthSelect.value);
+  }
   let charset = "";
 
   // Construction du jeu de caractères
@@ -38,9 +93,14 @@ function generatePassword() {
 
   // Vérification qu'au moins une option est sélectionnée
   if (charset === "") {
-    alert("Veuillez sélectionner au moins un type de caractère !");
+    copyMessage.textContent = "Vous devez cocher au moins un type de caractère !";
+    copyMessage.style.color = "#d60d0d";
+    setTimeout(() => {
+      copyMessage.textContent = "";
+    }, 3000);
     return;
   }
+  copyMessage.textContent = "";
 
   // Génération du mot de passe
   let password = "";
@@ -76,16 +136,16 @@ function evaluateStrength(password) {
 
   if (score <= 2) {
     strengthFill.classList.add("strength-weak");
-    strengthLabel.textContent = "Force: Faible";
+    strengthLabel.textContent = "Etat : Faible";
   } else if (score <= 4) {
     strengthFill.classList.add("strength-medium");
-    strengthLabel.textContent = "Force: Moyenne";
+    strengthLabel.textContent = "Etat : Moyenne";
   } else if (score <= 6) {
     strengthFill.classList.add("strength-strong");
-    strengthLabel.textContent = "Force: Forte";
+    strengthLabel.textContent = "Etat : Fort";
   } else {
     strengthFill.classList.add("strength-very-strong");
-    strengthLabel.textContent = "Force: Très forte";
+    strengthLabel.textContent = "Etat : Très fort";
   }
 }
 
@@ -93,7 +153,7 @@ function evaluateStrength(password) {
 function copyPassword() {
   if (passwordOutput.value === "") {
     copyMessage.textContent = "Veuillez d'abord générer un mot de passe !";
-    copyMessage.style.color = "red";
+    copyMessage.style.color = "#d60d0d";
     setTimeout(() => {
       copyMessage.textContent = "";
     }, 3000);
@@ -115,16 +175,3 @@ generateBtn.addEventListener("click", generatePassword);
 copyBtn.addEventListener("click", copyPassword);
 passwordOutput.addEventListener("click", copyPassword);
 
-// Génération automatique du premier mot de passe
-// generatePassword();
-
-// Génération automatique lors du changement des paramètres
-[
-  uppercaseCheck,
-  lowercaseCheck,
-  numbersCheck,
-  symbolsCheck,
-  lengthSlider,
-].forEach((element) => {
-  element.addEventListener("change", generatePassword);
-});
